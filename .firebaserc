@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "family-expense-tracker-cd319",
+    "production": "family-expense-tracker-cd319",
+    "testing": "family-expense-tracker-cd319"
+  },
+  "targets": {}
+}
