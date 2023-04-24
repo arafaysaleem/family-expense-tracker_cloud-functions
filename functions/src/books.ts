@@ -56,16 +56,16 @@ export const addBookToMember = functions.firestore
     const membersMap = change.after.get(BookFields.members) as Record<string, Member>;
 
     // Get the new members, i.e. members that weren't in the book before
-    const newMemberIds = Object.keys(membersMap).filter((memberId) => !change.before.get(BookFields.members)[memberId]);
+    const newMemberId = Object.keys(membersMap).find((memberId) => !change.before.get(BookFields.members)[memberId]);
 
-    if (!newMemberIds.length) {
+    if (!newMemberId) {
       console.error('No new members found for book', bookId);
       return;
     }
 
     try {
       // Get the user document from the 'users' collection, assuming there's only one new member
-      const userRef = firestore.collection(FirestorePaths.USERS).doc(newMemberIds[0]);
+      const userRef = firestore.collection(FirestorePaths.USERS).doc(newMemberId);
       const userDoc = await userRef.get();
 
       if (userDoc.exists) {
