@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import { firestore } from './firebase-admin';
 import { FirestorePaths } from './firestore-paths';
 
-export const createUserDocument = functions.auth
+export const createNewUser = functions.auth
   .user()
   .onCreate(async (user) => {
     const { uid, displayName, email, photoURL } = user;
