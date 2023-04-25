@@ -1,8 +1,17 @@
-import { addBookToOwner, addBookToMember } from './books';
-import { createNewUser } from './users';
 
-export const functions = {
+import { addBookToOwner, addBookToMember } from './books';
+export const books = {
   addBookToOwner,
-  addBookToMember,
+  addBookToMember
+};
+
+import { createNewUser } from './users';
+export const users = {
   createNewUser
+};
+
+import { updateWalletBalanceOnNewTransaction, updateWalletBalanceOnTransactionUpdate } from './transactions';
+export const transactions = {
+  updateWalletBalanceOnNewTransaction,
+  updateWalletBalanceOnTransactionUpdate
 };
