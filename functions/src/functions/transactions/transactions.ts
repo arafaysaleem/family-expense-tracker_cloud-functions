@@ -2,8 +2,8 @@ import * as functions from 'firebase-functions';
 import { firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import TransactionType from './../../enums/transaction_type.enum';
-import { handleNewBalanceTransfer, BalanceTransferTransaction } from './balance-transfer';
-import { handleNewIncomeExpense, IncomeExpenseTransaction } from './income-expense';
+import { handleNewBalanceTransfer, BalanceTransferTransaction, handleBalanceTransferUpdate } from './balance-transfer';
+import { handleIncomeExpenseUpdate, handleNewIncomeExpense, IncomeExpenseTransaction } from './income-expense';
 import { AdjustmentTransaction, handleNewBalanceAdjustment } from './balance-adjustment';
 
 export const updateWalletBalanceOnNewTransaction = functions.firestore
@@ -35,27 +35,19 @@ export const updateWalletBalanceOnTransactionUpdate = functions.firestore
     const transactionBefore = change.before.data();
     const transactionAfter = change.after.data();
 
-    const walletId = transactionBefore.wallet_id;
-    const typeBefore = transactionBefore.type;
-    const typeAfter = transactionAfter.type;
-    const amountBefore = transactionBefore.amount;
-    const amountAfter = transactionAfter.amount;
-
-    const isIncome = typeAfter === TransactionType.Income ? 1 : -1;
-    const typeChanged = typeAfter !== typeBefore ? 1 : -1;
-
-    const walletRef = firestore.doc(`books/${context.params.bookId}`);
-    const walletDoc = await walletRef.get();
-
-    const walletData = walletDoc.data()!;
-
-    const newAmount = amountAfter + amountBefore * typeChanged;
-    const newBalance = walletData.balance + newAmount * isIncome;
-
-    await walletRef.update({ balance: newBalance });
-
-    console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
-    return null;
+    if (transactionAfter.type === TransactionType.Income || transactionAfter.type === TransactionType.Expense) {
+      await handleIncomeExpenseUpdate(
+        transactionBefore as IncomeExpenseTransaction,
+        transactionAfter as IncomeExpenseTransaction,
+        context.params.bookId
+      );
+    } else if (transactionAfter.type === TransactionType.Transfer) {
+      await handleBalanceTransferUpdate(
+        transactionBefore as BalanceTransferTransaction,
+        transactionAfter as BalanceTransferTransaction,
+        context.params.bookId
+      );
+    }
   });
 
 export const updateWalletBalanceOnTransactionDelete = functions.firestore
@@ -77,5 +69,4 @@ export const updateWalletBalanceOnTransactionDelete = functions.firestore
     await walletRef.update({ balance: newBalance });
 
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
-    return null;
   });

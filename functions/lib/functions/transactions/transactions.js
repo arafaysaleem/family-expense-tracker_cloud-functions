@@ -33,21 +33,12 @@ exports.updateWalletBalanceOnTransactionUpdate = functions.firestore
     .onUpdate(async (change, context) => {
     const transactionBefore = change.before.data();
     const transactionAfter = change.after.data();
-    const walletId = transactionBefore.wallet_id;
-    const typeBefore = transactionBefore.type;
-    const typeAfter = transactionAfter.type;
-    const amountBefore = transactionBefore.amount;
-    const amountAfter = transactionAfter.amount;
-    const isIncome = typeAfter === transaction_type_enum_1.default.Income ? 1 : -1;
-    const typeChanged = typeAfter !== typeBefore ? 1 : -1;
-    const walletRef = firebase_admin_1.firestore.doc(`books/${context.params.bookId}`);
-    const walletDoc = await walletRef.get();
-    const walletData = walletDoc.data();
-    const newAmount = amountAfter + amountBefore * typeChanged;
-    const newBalance = walletData.balance + newAmount * isIncome;
-    await walletRef.update({ balance: newBalance });
-    console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
-    return null;
+    if (transactionAfter.type === transaction_type_enum_1.default.Income || transactionAfter.type === transaction_type_enum_1.default.Expense) {
+        await (0, income_expense_1.handleIncomeExpenseUpdate)(transactionBefore, transactionAfter, context.params.bookId);
+    }
+    else if (transactionAfter.type === transaction_type_enum_1.default.Transfer) {
+        await (0, balance_transfer_1.handleBalanceTransferUpdate)(transactionBefore, transactionAfter, context.params.bookId);
+    }
 });
 exports.updateWalletBalanceOnTransactionDelete = functions.firestore
     .document(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`)
@@ -63,6 +54,5 @@ exports.updateWalletBalanceOnTransactionDelete = functions.firestore
     const newBalance = walletData.balance + amount * isExpense;
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
-    return null;
 });
 //# sourceMappingURL=transactions.js.map
