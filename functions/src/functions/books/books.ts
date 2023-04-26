@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
-import { firestore } from './firebase-admin';
-import { FirestorePaths } from './firestore-paths';
+import { firestore } from '../../core/firebase-admin';
+import { FirestorePaths } from '../../core/firestore-paths';
 
 interface Member {
   role: string;
@@ -26,24 +26,17 @@ export const addBookToOwner = functions.firestore
     const bookId = snapshot.id;
     const membersMap = snapshot.get(BookFields.members) as Record<string, Member>;
 
-    const ownerId = Object.keys(membersMap).find((memberId) => membersMap[memberId].role === BookRoles.owner);
-
-    if (!ownerId) {
-      console.error('No owner found for book', bookId);
-      return;
-    }
+    const ownerId = Object.keys(membersMap).find((memberId) => membersMap[memberId].role === BookRoles.owner)!;
 
     try {
       // Get the user document from the 'users' collection
       const userRef = firestore.collection(FirestorePaths.USERS).doc(ownerId);
       const userDoc = await userRef.get();
 
-      if (userDoc.exists) {
-        // Add the new book id to the user's 'owned_book_ids' array
-        const ownedBookIds = userDoc.get(UserFields.ownedBookIds) || [];
-        ownedBookIds.push(bookId);
-        await userRef.update({ owned_book_ids: ownedBookIds });
-      }
+      // Add the new book id to the user's 'owned_book_ids' array
+      const ownedBookIds = userDoc.get(UserFields.ownedBookIds) || [];
+      ownedBookIds.push(bookId);
+      await userRef.update({ owned_book_ids: ownedBookIds });
     } catch (error) {
       console.error(error);
     }
@@ -68,12 +61,10 @@ export const addBookToMember = functions.firestore
       const userRef = firestore.collection(FirestorePaths.USERS).doc(newMemberId);
       const userDoc = await userRef.get();
 
-      if (userDoc.exists) {
-        // Add the new book id to the user's 'shared_book_ids' array
-        const sharedBookIds = userDoc.get(UserFields.sharedBookIds) || [];
-        sharedBookIds.push(bookId);
-        await userRef.update({ shared_book_ids: sharedBookIds });
-      }
+      // Add the new book id to the user's 'shared_book_ids' array
+      const sharedBookIds = userDoc.get(UserFields.sharedBookIds) || [];
+      sharedBookIds.push(bookId);
+      await userRef.update({ shared_book_ids: sharedBookIds });
     } catch (error) {
       console.error(error);
     }

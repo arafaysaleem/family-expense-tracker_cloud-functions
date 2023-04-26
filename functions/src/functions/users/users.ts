@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
-import { firestore } from './firebase-admin';
-import { FirestorePaths } from './firestore-paths';
+import { firestore } from '../../core/firebase-admin';
+import { FirestorePaths } from '../../core/firestore-paths';
 
 export const createNewUser = functions.auth
   .user()
