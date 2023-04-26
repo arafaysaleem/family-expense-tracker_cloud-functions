@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleBalanceTransferUpdate = exports.handleNewBalanceTransfer = void 0;
+exports.handleBalanceTransferDelete = exports.handleBalanceTransferUpdate = exports.handleNewBalanceTransfer = void 0;
 const firebase_admin_1 = require("../../core/firebase-admin");
 const firestore_paths_1 = require("../../core/firestore-paths");
 const handleNewBalanceTransfer = async (transactionData, bookId) => {
@@ -13,8 +13,10 @@ const handleNewBalanceTransfer = async (transactionData, bookId) => {
     const destWalletData = (await destWalletRef.get()).data();
     const newSrcBalance = srcWalletData.balance - amount;
     const newDestBalance = destWalletData.balance + amount;
-    await srcWalletRef.update({ balance: newSrcBalance });
-    await destWalletRef.update({ balance: newDestBalance });
+    await Promise.all([
+        srcWalletRef.update({ balance: newSrcBalance }),
+        destWalletRef.update({ balance: newDestBalance })
+    ]);
     console.log(`Updated balance for src wallet ${srcWalletId} to ${newSrcBalance} and dest wallet ${destWalletId} to ${newDestBalance}.`);
 };
 exports.handleNewBalanceTransfer = handleNewBalanceTransfer;
@@ -26,10 +28,12 @@ const handleBalanceTransferUpdate = async (transactionBefore, transactionAfter, 
         // if the src wallet has changed, update old and new src wallets
         const oldSrcWalletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${oldSrcWalletId}`);
         const oldSrcWalletData = (await oldSrcWalletRef.get()).data();
-        await oldSrcWalletRef.update({ balance: oldSrcWalletData.balance + oldAmount });
         const newSrcWalletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${newSrcWalletId}`);
         const newSrcWalletData = (await newSrcWalletRef.get()).data();
-        await newSrcWalletRef.update({ balance: newSrcWalletData.balance - newAmount });
+        await Promise.all([
+            oldSrcWalletRef.update({ balance: oldSrcWalletData.balance + oldAmount }),
+            newSrcWalletRef.update({ balance: newSrcWalletData.balance - newAmount })
+        ]);
     }
     else if (oldAmount !== newAmount) {
         console.log('Amount changed, updating src wallet balance');
@@ -44,8 +48,10 @@ const handleBalanceTransferUpdate = async (transactionBefore, transactionAfter, 
         const newDestWalletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${newDestWalletId}`);
         const oldDestWalletData = (await oldDestWalletRef.get()).data();
         const newDestWalletData = (await newDestWalletRef.get()).data();
-        await oldDestWalletRef.update({ balance: oldDestWalletData.balance - oldAmount });
-        await newDestWalletRef.update({ balance: newDestWalletData.balance + newAmount });
+        await Promise.all([
+            oldDestWalletRef.update({ balance: oldDestWalletData.balance - oldAmount }),
+            newDestWalletRef.update({ balance: newDestWalletData.balance + newAmount })
+        ]);
     }
     else if (oldAmount !== newAmount) {
         console.log('Amount changed, updating dest wallet balance');
@@ -55,4 +61,22 @@ const handleBalanceTransferUpdate = async (transactionBefore, transactionAfter, 
     }
 };
 exports.handleBalanceTransferUpdate = handleBalanceTransferUpdate;
+const handleBalanceTransferDelete = async (transactionData, bookId) => {
+    const srcWalletId = transactionData.src_wallet_id;
+    const destWalletId = transactionData.dest_wallet_id;
+    const amount = transactionData.amount;
+    const srcWalletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${srcWalletId}`);
+    const srcWalletData = (await srcWalletRef.get()).data();
+    const newSrcBalance = srcWalletData.balance + amount;
+    const destWalletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${destWalletId}`);
+    const destWalletData = (await destWalletRef.get()).data();
+    const newDestBalance = destWalletData.balance - amount;
+    await Promise.all([
+        srcWalletRef.update({ balance: newSrcBalance }),
+        destWalletRef.update({ balance: newDestBalance })
+    ]);
+    console.log(`Updated balance for wallet ${srcWalletId} to ${newSrcBalance}.`);
+    console.log(`Updated balance for wallet ${destWalletId} to ${newDestBalance}.`);
+};
+exports.handleBalanceTransferDelete = handleBalanceTransferDelete;
 //# sourceMappingURL=balance-transfer.js.map

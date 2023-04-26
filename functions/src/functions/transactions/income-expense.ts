@@ -52,5 +52,21 @@ export const handleIncomeExpenseUpdate = async (
 
   console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };
+
+export const handleIncomeExpenseDelete = async (transactionData: IncomeExpenseTransaction, bookId: string): Promise<void> => {
+  const walletId = transactionData.wallet_id;
+  const type = transactionData.type;
+  const amount = transactionData.amount;
+
+  const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${walletId}`);
+  const walletData = (await walletRef.get()).data()!;
+
+  const isExpense = type === TransactionType.Expense ? 1 : -1;
+  const newBalance = walletData.balance + amount * isExpense;
+
+  await walletRef.update({ balance: newBalance });
+
+  console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
+};
   
 
