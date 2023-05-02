@@ -1,4 +1,4 @@
-import { firestore } from '../../core/firebase-admin';
+import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import TransactionType from '../../enums/transaction_type.enum';
 
@@ -26,9 +26,9 @@ export const handleBalanceAdjustmentDelete = async (transactionData: AdjustmentT
   const previousAmount = transactionData.previous_amount;
 
   const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${walletId}`);
-  const walletData = (await walletRef.get()).data()!;
 
-  const newBalance = walletData.balance - (nowAmount - previousAmount);
+  const diff = nowAmount - previousAmount;
+  const newBalance = FieldValue.increment(-diff);
 
   await walletRef.update({ balance: newBalance });
 

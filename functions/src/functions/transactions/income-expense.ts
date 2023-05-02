@@ -1,4 +1,4 @@
-import { firestore } from '../../core/firebase-admin';
+import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import TransactionType from '../../enums/transaction_type.enum';
 
@@ -15,16 +15,14 @@ export const handleNewIncomeExpense = async (transactionData: IncomeExpenseTrans
   const walletId = transactionData.wallet_id;
   const type = transactionData.type;
   const amount = transactionData.amount;
-  
+
   const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${walletId}`);
-  const walletDoc = await walletRef.get();
-  const walletData = walletDoc.data()!;
-  
+
   const isIncome = type === TransactionType.Income ? 1 : -1;
-  const newBalance = walletData.balance + amount * isIncome;
-  
+  const newBalance = FieldValue.increment(amount * isIncome);
+
   await walletRef.update({ balance: newBalance });
-  
+
   console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };
 
@@ -43,10 +41,9 @@ export const handleIncomeExpenseUpdate = async (
   const typeChanged = typeAfter !== typeBefore ? 1 : -1;
 
   const walletRef = firestore.doc(`books/${bookId}`);
-  const walletData = (await walletRef.get()).data()!;
 
   const newAmount = amountAfter + amountBefore * typeChanged;
-  const newBalance = walletData.balance + newAmount * isIncome;
+  const newBalance = FieldValue.increment(newAmount * isIncome);
 
   await walletRef.update({ balance: newBalance });
 
@@ -59,14 +56,13 @@ export const handleIncomeExpenseDelete = async (transactionData: IncomeExpenseTr
   const amount = transactionData.amount;
 
   const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${walletId}`);
-  const walletData = (await walletRef.get()).data()!;
 
   const isExpense = type === TransactionType.Expense ? 1 : -1;
-  const newBalance = walletData.balance + amount * isExpense;
+  const newBalance = FieldValue.increment(amount * isExpense);
 
   await walletRef.update({ balance: newBalance });
 
   console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };
-  
+
 

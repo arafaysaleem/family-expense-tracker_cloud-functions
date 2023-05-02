@@ -4,4 +4,5 @@ import * as admin from 'firebase-admin';
 admin.initializeApp();
 
 // Export a Firestore instance
+export const FieldValue = admin.firestore.FieldValue;
 export const firestore = admin.firestore();

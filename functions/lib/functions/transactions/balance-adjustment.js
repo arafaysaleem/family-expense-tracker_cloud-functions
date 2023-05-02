@@ -15,8 +15,8 @@ const handleBalanceAdjustmentDelete = async (transactionData, bookId) => {
     const nowAmount = transactionData.amount;
     const previousAmount = transactionData.previous_amount;
     const walletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${walletId}`);
-    const walletData = (await walletRef.get()).data();
-    const newBalance = walletData.balance - (nowAmount - previousAmount);
+    const diff = nowAmount - previousAmount;
+    const newBalance = firebase_admin_1.FieldValue.increment(-diff);
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };

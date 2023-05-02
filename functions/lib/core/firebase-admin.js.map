@@ -1,1 +1,1 @@
-{"version":3,"file":"firebase-admin.js","sourceRoot":"","sources":["../../src/core/firebase-admin.ts"],"names":[],"mappings":";;;AAAA,wCAAwC;AAExC,oCAAoC;AACpC,KAAK,CAAC,aAAa,EAAE,CAAC;AAEtB,8BAA8B;AACjB,QAAA,SAAS,GAAG,KAAK,CAAC,SAAS,EAAE,CAAC"}
+{"version":3,"file":"firebase-admin.js","sourceRoot":"","sources":["../../src/core/firebase-admin.ts"],"names":[],"mappings":";;;AAAA,wCAAwC;AAExC,oCAAoC;AACpC,KAAK,CAAC,aAAa,EAAE,CAAC;AAEtB,8BAA8B;AACjB,QAAA,UAAU,GAAG,KAAK,CAAC,SAAS,CAAC,UAAU,CAAC;AACxC,QAAA,SAAS,GAAG,KAAK,CAAC,SAAS,EAAE,CAAC"}

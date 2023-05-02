@@ -9,10 +9,8 @@ const handleNewIncomeExpense = async (transactionData, bookId) => {
     const type = transactionData.type;
     const amount = transactionData.amount;
     const walletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${walletId}`);
-    const walletDoc = await walletRef.get();
-    const walletData = walletDoc.data();
     const isIncome = type === transaction_type_enum_1.default.Income ? 1 : -1;
-    const newBalance = walletData.balance + amount * isIncome;
+    const newBalance = firebase_admin_1.FieldValue.increment(amount * isIncome);
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };
@@ -26,9 +24,8 @@ const handleIncomeExpenseUpdate = async (transactionBefore, transactionAfter, bo
     const isIncome = typeAfter === transaction_type_enum_1.default.Income ? 1 : -1;
     const typeChanged = typeAfter !== typeBefore ? 1 : -1;
     const walletRef = firebase_admin_1.firestore.doc(`books/${bookId}`);
-    const walletData = (await walletRef.get()).data();
     const newAmount = amountAfter + amountBefore * typeChanged;
-    const newBalance = walletData.balance + newAmount * isIncome;
+    const newBalance = firebase_admin_1.FieldValue.increment(newAmount * isIncome);
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };
@@ -38,9 +35,8 @@ const handleIncomeExpenseDelete = async (transactionData, bookId) => {
     const type = transactionData.type;
     const amount = transactionData.amount;
     const walletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${walletId}`);
-    const walletData = (await walletRef.get()).data();
     const isExpense = type === transaction_type_enum_1.default.Expense ? 1 : -1;
-    const newBalance = walletData.balance + amount * isExpense;
+    const newBalance = firebase_admin_1.FieldValue.increment(amount * isExpense);
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
 };

@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { firestore } from '../../core/firebase-admin';
+import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 
 interface Member {
@@ -9,11 +9,6 @@ interface Member {
 
 class BookFields {
   static members = 'members';
-}
-
-class UserFields {
-  static ownedBookIds = 'owned_book_ids';
-  static sharedBookIds = 'shared_book_ids';
 }
 
 enum BookRoles {
@@ -31,11 +26,9 @@ export const addBookToOwner = functions.firestore
     try {
       // Get the user document from the 'users' collection
       const userRef = firestore.collection(FirestorePaths.USERS).doc(ownerId);
-      const userDoc = await userRef.get();
 
       // Add the new book id to the user's 'owned_book_ids' array
-      const ownedBookIds = userDoc.get(UserFields.ownedBookIds) || [];
-      ownedBookIds.push(bookId);
+      const ownedBookIds = FieldValue.arrayUnion(bookId);
       await userRef.update({ owned_book_ids: ownedBookIds });
     } catch (error) {
       console.error(error);
@@ -59,11 +52,9 @@ export const addBookToMember = functions.firestore
     try {
       // Get the user document from the 'users' collection, assuming there's only one new member
       const userRef = firestore.collection(FirestorePaths.USERS).doc(newMemberId);
-      const userDoc = await userRef.get();
 
       // Add the new book id to the user's 'shared_book_ids' array
-      const sharedBookIds = userDoc.get(UserFields.sharedBookIds) || [];
-      sharedBookIds.push(bookId);
+      const sharedBookIds = FieldValue.arrayUnion(bookId);
       await userRef.update({ shared_book_ids: sharedBookIds });
     } catch (error) {
       console.error(error);

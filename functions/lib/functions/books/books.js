@@ -7,10 +7,6 @@ const firestore_paths_1 = require("../../core/firestore-paths");
 class BookFields {
 }
 BookFields.members = 'members';
-class UserFields {
-}
-UserFields.ownedBookIds = 'owned_book_ids';
-UserFields.sharedBookIds = 'shared_book_ids';
 var BookRoles;
 (function (BookRoles) {
     BookRoles["owner"] = "owner";
@@ -24,10 +20,8 @@ exports.addBookToOwner = functions.firestore
     try {
         // Get the user document from the 'users' collection
         const userRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.USERS).doc(ownerId);
-        const userDoc = await userRef.get();
         // Add the new book id to the user's 'owned_book_ids' array
-        const ownedBookIds = userDoc.get(UserFields.ownedBookIds) || [];
-        ownedBookIds.push(bookId);
+        const ownedBookIds = firebase_admin_1.FieldValue.arrayUnion(bookId);
         await userRef.update({ owned_book_ids: ownedBookIds });
     }
     catch (error) {
@@ -48,10 +42,8 @@ exports.addBookToMember = functions.firestore
     try {
         // Get the user document from the 'users' collection, assuming there's only one new member
         const userRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.USERS).doc(newMemberId);
-        const userDoc = await userRef.get();
         // Add the new book id to the user's 'shared_book_ids' array
-        const sharedBookIds = userDoc.get(UserFields.sharedBookIds) || [];
-        sharedBookIds.push(bookId);
+        const sharedBookIds = firebase_admin_1.FieldValue.arrayUnion(bookId);
         await userRef.update({ shared_book_ids: sharedBookIds });
     }
     catch (error) {
