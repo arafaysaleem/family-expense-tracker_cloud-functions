@@ -1,10 +1,20 @@
 import * as functions from 'firebase-functions';
 import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
+import DefaultsType from '../../enums/defaults_type.enum';
 
 interface Member {
   role: string;
   image_url: string;
+}
+
+interface Wallet {
+  name: string
+  id: string,
+  balance: number,
+  color: string,
+  description: string | undefined,
+  is_enabled: boolean,
 }
 
 class BookFields {
@@ -30,6 +40,18 @@ export const addBookToOwner = functions.firestore
       // Add the new book id to the user's 'owned_book_ids' array
       const ownedBookIds = FieldValue.arrayUnion(bookId);
       await userRef.update({ owned_book_ids: ownedBookIds });
+
+      // Get the new book defaults from the 'defaults' collection
+      const defaultWalletsRef = firestore.collection(FirestorePaths.DEFAULTS).doc(DefaultsType.Wallets);
+
+      const defaultWallets: Array<Wallet> = (await defaultWalletsRef.get()).data()!.items;
+
+      // Create a new 'wallets' collection for the book
+      const walletsRef = firestore.collection(FirestorePaths.BOOKS).doc(bookId).collection(FirestorePaths.WALLETS);
+
+      // Add the default wallets to the 'wallets' collection
+      const wallets = defaultWallets.map((wallet) => walletsRef.add(wallet));
+      await Promise.all(wallets);
     } catch (error) {
       console.error(error);
     }
