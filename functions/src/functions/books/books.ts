@@ -11,6 +11,7 @@ interface Member {
 interface Wallet {
   name: string
   id: string,
+  icon_key: string,
   balance: number,
   color: string,
   description: string | undefined,
