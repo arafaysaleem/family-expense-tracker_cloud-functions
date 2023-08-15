@@ -30,7 +30,7 @@ exports.addBookToOwner = functions.firestore
         // Create a new 'wallets' collection for the book
         const walletsRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.BOOKS).doc(bookId).collection(firestore_paths_1.FirestorePaths.WALLETS);
         // Add the default wallets to the 'wallets' collection
-        const wallets = defaultWallets.map((wallet) => walletsRef.add(wallet));
+        const wallets = defaultWallets.map((wallet) => walletsRef.doc(wallet.id).set(wallet));
         await Promise.all(wallets);
     }
     catch (error) {
