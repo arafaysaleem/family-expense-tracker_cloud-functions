@@ -2,20 +2,11 @@ import * as functions from 'firebase-functions';
 import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import DefaultsType from '../../enums/defaults_type.enum';
+import { Wallet } from '../wallets/wallets';
 
 interface Member {
   role: string;
   image_url: string;
-}
-
-interface Wallet {
-  name: string
-  id: string,
-  icon_key: string,
-  balance: number,
-  color: string,
-  description: string | undefined,
-  is_enabled: boolean,
 }
 
 class BookFields {
@@ -83,3 +74,31 @@ export const addBookToMember = functions.firestore
       console.error(error);
     }
   });
+
+export const deleteBookFromMembers = functions.firestore
+  .document(`${FirestorePaths.BOOKS}/{bookId}`)
+  .onDelete(async (snap, context) => {
+    const bookData = snap.data();
+    const membersMap = bookData.get(BookFields.members) as Record<string, Member>;
+
+    for (const memberId of Object.keys(membersMap)) {
+      try {
+        const member = membersMap[memberId];
+
+        // Get the user document from the 'users' collection
+        const userRef = firestore.collection(FirestorePaths.USERS).doc(memberId);
+
+        // Remove the book id from the user's 'owned_book_ids' array if the user is the owner
+        // Otherwise, remove the book id from the user's 'shared_book_ids' array
+        const bookIdsArr = FieldValue.arrayRemove(context.params.bookId);
+        if (member.role === BookRoles.owner) {
+          await userRef.update({ owned_book_ids: bookIdsArr });
+        } else {
+          await userRef.update({ shared_book_ids: bookIdsArr });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
+

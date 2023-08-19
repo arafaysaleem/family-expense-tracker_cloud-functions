@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addBookToMember = exports.addBookToOwner = void 0;
+exports.deleteBookFromMembers = exports.addBookToMember = exports.addBookToOwner = void 0;
 const functions = require("firebase-functions");
 const firebase_admin_1 = require("../../core/firebase-admin");
 const firestore_paths_1 = require("../../core/firestore-paths");
@@ -57,6 +57,31 @@ exports.addBookToMember = functions.firestore
     }
     catch (error) {
         console.error(error);
+    }
+});
+exports.deleteBookFromMembers = functions.firestore
+    .document(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`)
+    .onDelete(async (snap, context) => {
+    const bookData = snap.data();
+    const membersMap = bookData.get(BookFields.members);
+    for (const memberId of Object.keys(membersMap)) {
+        try {
+            const member = membersMap[memberId];
+            // Get the user document from the 'users' collection
+            const userRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.USERS).doc(memberId);
+            // Remove the book id from the user's 'owned_book_ids' array if the user is the owner
+            // Otherwise, remove the book id from the user's 'shared_book_ids' array
+            const bookIdsArr = firebase_admin_1.FieldValue.arrayRemove(context.params.bookId);
+            if (member.role === BookRoles.owner) {
+                await userRef.update({ owned_book_ids: bookIdsArr });
+            }
+            else {
+                await userRef.update({ shared_book_ids: bookIdsArr });
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
 });
 //# sourceMappingURL=books.js.map

@@ -1,9 +1,10 @@
 
 // Book functions
-import { addBookToOwner, addBookToMember } from './functions/books/books';
+import { addBookToOwner, addBookToMember, deleteBookFromMembers } from './functions/books/books';
 export const books = {
   addBookToOwner,
-  addBookToMember
+  addBookToMember,
+  deleteBookFromMembers
 };
 
 // User functions
