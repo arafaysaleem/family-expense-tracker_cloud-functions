@@ -6,7 +6,6 @@ class FirestorePaths {
 exports.FirestorePaths = FirestorePaths;
 FirestorePaths.BOOKS = 'books';
 FirestorePaths.USERS = 'users';
-FirestorePaths.TRANSACTION_GROUPS = 'transaction-groups';
 FirestorePaths.TRANSACTIONS = 'transactions';
 FirestorePaths.WALLETS = 'wallets';
 FirestorePaths.DEFAULTS = 'defaults';

@@ -1,12 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateWalletBalanceOnTransactionDelete = exports.updateWalletBalanceOnTransactionUpdate = exports.updateWalletBalanceOnNewTransaction = void 0;
+exports.updateWalletBalanceOnTransactionDelete = exports.updateWalletBalanceOnTransactionUpdate = exports.updateWalletBalanceOnNewTransaction = exports.createNewTransaction = void 0;
 const functions = require("firebase-functions");
 const firestore_paths_1 = require("../../core/firestore-paths");
 const transaction_type_enum_1 = require("./../../enums/transaction_type.enum");
 const balance_transfer_1 = require("./balance-transfer");
 const income_expense_1 = require("./income-expense");
 const balance_adjustment_1 = require("./balance-adjustment");
+const createNewTransaction = async (transactionData, bookId) => {
+    switch (transactionData.type) {
+        case transaction_type_enum_1.default.Adjustment:
+            await (0, balance_adjustment_1.createNewBalanceAdjustment)(transactionData, bookId);
+            break;
+        case transaction_type_enum_1.default.Income:
+        case transaction_type_enum_1.default.Expense:
+        case transaction_type_enum_1.default.Transfer:
+            console.log('Creating transactions for income, expense or transfer is not implemented yet.');
+            break;
+        default:
+            console.log('Transaction type is neither income, expense, transfer nor adjustment. Skipping transaction create.');
+    }
+};
+exports.createNewTransaction = createNewTransaction;
 exports.updateWalletBalanceOnNewTransaction = functions.firestore
     .document(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`)
     .onCreate(async (snap, context) => {

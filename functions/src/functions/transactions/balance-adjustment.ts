@@ -1,6 +1,8 @@
 import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import TransactionType from '../../enums/transaction_type.enum';
+import { v4 as uuidv4 } from 'uuid';
+import { formatDateToISO } from '../../utils/utils';
 
 export interface AdjustmentTransaction {
     type: TransactionType.Adjustment;
@@ -8,8 +10,27 @@ export interface AdjustmentTransaction {
     previous_amount: number;
     wallet_id: string;
     date: Date;
-    description: string | undefined;
 }
+
+export const createNewBalanceAdjustment = async (transactionData: AdjustmentTransaction, bookId: string): Promise<void> => {
+  const transMonth = transactionData.date.getMonth() + 1; // starts from 0
+  const transYear = transactionData.date.getFullYear();
+  const transCollectionId = `${FirestorePaths.TRANSACTIONS}-${transMonth}-${transYear}`;
+
+  const transRef = firestore.collection(FirestorePaths.BOOKS).doc(bookId).collection(transCollectionId);
+
+  const id: string = uuidv4();
+  const { date: transDate, ...rest } = transactionData;
+  const transactionDataWithDate = {
+    id: id,
+    date: formatDateToISO(transDate),
+    ...rest
+  };
+  await transRef.doc(id).set(transactionDataWithDate);
+
+  const newBalance = transactionData.amount;
+  console.log(`Added adjustment transaction for new wallet ${transactionData.wallet_id} to ${newBalance}.`);
+};
 
 export const handleNewBalanceAdjustment = async (transactionData: AdjustmentTransaction, bookId: string): Promise<void> => {
   const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${transactionData.wallet_id}`);
