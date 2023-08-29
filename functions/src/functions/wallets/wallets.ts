@@ -19,6 +19,9 @@ export const createBalanceAdjustmentOnNewWallet = functions.firestore
   .onCreate(async (snap, context) => {
     const walletData = snap.data();
 
+    // usually for default wallets, bcz user can't create wallet with 0 balance
+    if (walletData.balance === 0) return;
+
     const adjustmentTransaction : AdjustmentTransaction = {
       type: TransactionType.Adjustment,
       amount: walletData.balance,
