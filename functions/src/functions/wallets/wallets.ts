@@ -22,29 +22,11 @@ export const createBalanceAdjustmentOnNewWallet = functions.firestore
     // usually for default wallets, bcz user can't create wallet with 0 balance
     if (walletData.balance === 0) return;
 
-    const adjustmentTransaction : AdjustmentTransaction = {
+    const adjustmentTransaction: AdjustmentTransaction = {
       type: TransactionType.Adjustment,
       amount: walletData.balance,
       previous_amount: 0,
       wallet_id: walletData.id,
-      date: new Date()
-    };
-    await createNewTransaction(adjustmentTransaction, context.params.bookId);
-  });
-
-export const createBalanceAdjustmentOnWalletBalanceUpdate = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}/${FirestorePaths.WALLETS}/{walletId}`)
-  .onUpdate(async (change, context) => {
-    const balanceBefore = change.before.data().balance;
-    const balanceAfter = change.after.data().balance;
-
-    if (balanceAfter == balanceBefore) return;
-
-    const adjustmentTransaction : AdjustmentTransaction = {
-      type: TransactionType.Adjustment,
-      amount: balanceAfter,
-      previous_amount: balanceBefore,
-      wallet_id: context.params.walletId,
       date: new Date()
     };
     await createNewTransaction(adjustmentTransaction, context.params.bookId);

@@ -26,11 +26,7 @@ export const transactions = {
 };
 
 // Wallet functions
-import {
-  createBalanceAdjustmentOnNewWallet,
-  createBalanceAdjustmentOnWalletBalanceUpdate
-} from './functions/wallets/wallets';
+import { createBalanceAdjustmentOnNewWallet } from './functions/wallets/wallets';
 export const wallets = {
-  createBalanceAdjustmentOnNewWallet,
-  createBalanceAdjustmentOnWalletBalanceUpdate
+  createBalanceAdjustmentOnNewWallet
 };

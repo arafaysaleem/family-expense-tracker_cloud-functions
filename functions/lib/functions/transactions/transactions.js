@@ -38,7 +38,7 @@ exports.updateWalletBalanceOnNewTransaction = functions.firestore
             await (0, balance_adjustment_1.handleNewBalanceAdjustment)(transactionData, context.params.bookId);
             break;
         default:
-            console.log('Transaction type is neither income, expense, transfer nor adjustment. Skipping wallet balance update.');
+            console.log('Transaction type is not income, expense, transfer or adjustment. Skipping wallet balance update.');
     }
 });
 exports.updateWalletBalanceOnTransactionUpdate = functions.firestore
