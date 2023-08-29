@@ -29,7 +29,7 @@ export const createNewBalanceAdjustment = async (transactionData: AdjustmentTran
   await transRef.doc(id).set(transactionDataWithDate);
 
   const newBalance = transactionData.amount;
-  console.log(`Added adjustment transaction for new wallet ${transactionData.wallet_id} to ${newBalance}.`);
+  console.log(`Adjusted balance for wallet id: ${transactionData.wallet_id}, to: ${newBalance}.`);
 };
 
 export const handleNewBalanceAdjustment = async (transactionData: AdjustmentTransaction, bookId: string): Promise<void> => {
@@ -38,7 +38,7 @@ export const handleNewBalanceAdjustment = async (transactionData: AdjustmentTran
   const newBalance = transactionData.amount;
   await walletRef.update({ balance: newBalance });
 
-  console.log(`Adjusted balance for wallet ${transactionData.wallet_id} to ${newBalance}.`);
+  console.log(`Adjusted balance for wallet id: ${transactionData.wallet_id}, to: ${newBalance}.`);
 };
 
 export const handleBalanceAdjustmentDelete = async (transactionData: AdjustmentTransaction, bookId: string): Promise<void> => {
@@ -53,6 +53,6 @@ export const handleBalanceAdjustmentDelete = async (transactionData: AdjustmentT
 
   await walletRef.update({ balance: newBalance });
 
-  console.log(`Adjusted balance for wallet ${walletId} to ${newBalance}.`);
+  console.log(`Adjusted balance for wallet id: ${walletId}, to: ${newBalance}.`);
 };
 

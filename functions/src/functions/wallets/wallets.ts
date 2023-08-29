@@ -31,3 +31,21 @@ export const createBalanceAdjustmentOnNewWallet = functions.firestore
     };
     await createNewTransaction(adjustmentTransaction, context.params.bookId);
   });
+
+export const createBalanceAdjustmentOnWalletBalanceUpdate = functions.firestore
+  .document(`${FirestorePaths.BOOKS}/{bookId}/${FirestorePaths.WALLETS}/{walletId}`)
+  .onUpdate(async (change, context) => {
+    const balanceBefore = change.before.data().balance;
+    const balanceAfter = change.after.data().balance;
+
+    if (balanceAfter == balanceBefore) return;
+
+    const adjustmentTransaction : AdjustmentTransaction = {
+      type: TransactionType.Adjustment,
+      amount: balanceAfter,
+      previous_amount: balanceBefore,
+      wallet_id: context.params.walletId,
+      date: new Date()
+    };
+    await createNewTransaction(adjustmentTransaction, context.params.bookId);
+  });

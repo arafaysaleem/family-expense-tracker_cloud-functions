@@ -26,14 +26,14 @@ const createNewBalanceAdjustment = async (transactionData, bookId) => {
     const transactionDataWithDate = Object.assign({ id: id, date: (0, utils_1.formatDateToISO)(transDate) }, rest);
     await transRef.doc(id).set(transactionDataWithDate);
     const newBalance = transactionData.amount;
-    console.log(`Added adjustment transaction for new wallet ${transactionData.wallet_id} to ${newBalance}.`);
+    console.log(`Adjusted balance for wallet id: ${transactionData.wallet_id}, to: ${newBalance}.`);
 };
 exports.createNewBalanceAdjustment = createNewBalanceAdjustment;
 const handleNewBalanceAdjustment = async (transactionData, bookId) => {
     const walletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${transactionData.wallet_id}`);
     const newBalance = transactionData.amount;
     await walletRef.update({ balance: newBalance });
-    console.log(`Adjusted balance for wallet ${transactionData.wallet_id} to ${newBalance}.`);
+    console.log(`Adjusted balance for wallet id: ${transactionData.wallet_id}, to: ${newBalance}.`);
 };
 exports.handleNewBalanceAdjustment = handleNewBalanceAdjustment;
 const handleBalanceAdjustmentDelete = async (transactionData, bookId) => {
@@ -44,7 +44,7 @@ const handleBalanceAdjustmentDelete = async (transactionData, bookId) => {
     const diff = nowAmount - previousAmount;
     const newBalance = firebase_admin_1.FieldValue.increment(-diff);
     await walletRef.update({ balance: newBalance });
-    console.log(`Adjusted balance for wallet ${walletId} to ${newBalance}.`);
+    console.log(`Adjusted balance for wallet id: ${walletId}, to: ${newBalance}.`);
 };
 exports.handleBalanceAdjustmentDelete = handleBalanceAdjustmentDelete;
 //# sourceMappingURL=balance-adjustment.js.map

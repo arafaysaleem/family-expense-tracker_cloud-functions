@@ -23,6 +23,7 @@ exports.transactions = {
 // Wallet functions
 const wallets_1 = require("./functions/wallets/wallets");
 exports.wallets = {
-    createBalanceAdjustmentOnNewWallet: wallets_1.createBalanceAdjustmentOnNewWallet
+    createBalanceAdjustmentOnNewWallet: wallets_1.createBalanceAdjustmentOnNewWallet,
+    createBalanceAdjustmentOnWalletBalanceUpdate: wallets_1.createBalanceAdjustmentOnWalletBalanceUpdate
 };
 //# sourceMappingURL=index.js.map

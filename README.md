@@ -1,7 +1,5 @@
-# live_cricket_firebase
+# Family Expenses Tracker - Backend Triggers
 
-Create a .env file inside `functions` folder, with the following keys:
-```
-BASE_URL=YOUR_BASE_URL_HERE
-API_KEY=YOUR_API_KEY_HERE
-```
+## TODO
+- [ ] Wrap all the functions in a transaction for retries in correct order. This ensures atomicity, consistency and isolation.
+
