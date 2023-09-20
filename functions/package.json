@@ -7,7 +7,7 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "rules": "firebase deploy --only firestore:rules",
+    "rules": "firebase deploy --only firestore",
     "logs": "firebase functions:log"
   },
   "engines": {
