@@ -4,5 +4,15 @@
       "npm --prefix \"%RESOURCE_DIR%\" run lint",
       "npm --prefix \"%RESOURCE_DIR%\" run build"
     ]
-  }
+  },
+  "firestore": [
+    {
+      "database": "default",
+      "rules": "firestore.rules"
+    },
+    {
+      "database": "prod",
+      "rules": "firestore.prod.rules"
+    }
+  ]
 }
