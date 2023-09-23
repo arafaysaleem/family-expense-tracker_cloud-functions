@@ -1,9 +1,10 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated, onDocumentUpdated, onDocumentDeleted } from 'firebase-functions/v2/firestore';
 import { FirestorePaths } from '../../core/firestore-paths';
-import TransactionType from './../../enums/transaction_type.enum';
+import { TransactionType } from './../../enums/transaction_type.enum';
 import { handleNewBalanceTransfer, BalanceTransferTransaction, handleBalanceTransferUpdate, handleBalanceTransferDelete } from './balance-transfer';
 import { handleIncomeExpenseDelete, handleIncomeExpenseUpdate, handleNewIncomeExpense, IncomeExpenseTransaction } from './income-expense';
 import { AdjustmentTransaction, handleBalanceAdjustmentDelete, handleNewBalanceAdjustment, createNewBalanceAdjustment } from './balance-adjustment';
+import { FIRESTORE_DB_NAME } from '../../core/firebase-admin';
 
 export const createNewTransaction = async (
   transactionData: IncomeExpenseTransaction | BalanceTransferTransaction | AdjustmentTransaction,
@@ -23,65 +24,77 @@ export const createNewTransaction = async (
   }
 };
 
-export const updateWalletBalanceOnNewTransaction = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`)
-  .onCreate(async (snap, context) => {
-    const transactionData = snap.data();
+export const updateWalletBalanceOnNewTransaction = onDocumentCreated(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
+  },
+  async (event) => {
+    const transactionData = event.data!.data();
 
     switch (transactionData.type) {
     case TransactionType.Income:
     case TransactionType.Expense:
-      await handleNewIncomeExpense(transactionData as IncomeExpenseTransaction, context.params.bookId);
+      await handleNewIncomeExpense(transactionData as IncomeExpenseTransaction, event.params.bookId);
       break;
     case TransactionType.Transfer:
-      await handleNewBalanceTransfer(transactionData as BalanceTransferTransaction, context.params.bookId);
+      await handleNewBalanceTransfer(transactionData as BalanceTransferTransaction, event.params.bookId);
       break;
     case TransactionType.Adjustment:
-      await handleNewBalanceAdjustment(transactionData as AdjustmentTransaction, context.params.bookId);
+      await handleNewBalanceAdjustment(transactionData as AdjustmentTransaction, event.params.bookId);
       break;
     default:
       console.log('Transaction type is not income, expense, transfer or adjustment. Skipping wallet balance update.');
     }
-  });
+  }
+);
 
-export const updateWalletBalanceOnTransactionUpdate = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`)
-  .onUpdate(async (change, context) => {
-    const transactionBefore = change.before.data();
-    const transactionAfter = change.after.data();
+export const updateWalletBalanceOnTransactionUpdate = onDocumentUpdated(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
+  },
+  async (event) => {
+    const transactionBefore = event.data!.before.data();
+    const transactionAfter = event.data!.after.data();
 
     if (transactionAfter.type === TransactionType.Income || transactionAfter.type === TransactionType.Expense) {
       await handleIncomeExpenseUpdate(
         transactionBefore as IncomeExpenseTransaction,
         transactionAfter as IncomeExpenseTransaction,
-        context.params.bookId
+        event.params.bookId
       );
     } else if (transactionAfter.type === TransactionType.Transfer) {
       await handleBalanceTransferUpdate(
         transactionBefore as BalanceTransferTransaction,
         transactionAfter as BalanceTransferTransaction,
-        context.params.bookId
+        event.params.bookId
       );
     }
-  });
+  }
+);
 
-export const updateWalletBalanceOnTransactionDelete = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`)
-  .onDelete(async (snap, context) => {
-    const transactionData = snap.data();
+export const updateWalletBalanceOnTransactionDelete = onDocumentDeleted(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
+  },
+  async (event) => {
+    const transactionData = event.data!.data();
 
     switch (transactionData.type) {
     case TransactionType.Income:
     case TransactionType.Expense:
-      await handleIncomeExpenseDelete(transactionData as IncomeExpenseTransaction, context.params.bookId);
+      await handleIncomeExpenseDelete(transactionData as IncomeExpenseTransaction, event.params.bookId);
       break;
     case TransactionType.Transfer:
-      await handleBalanceTransferDelete(transactionData as BalanceTransferTransaction, context.params.bookId);
+      await handleBalanceTransferDelete(transactionData as BalanceTransferTransaction, event.params.bookId);
       break;
     case TransactionType.Adjustment:
-      await handleBalanceAdjustmentDelete(transactionData as AdjustmentTransaction, context.params.bookId);
+      await handleBalanceAdjustmentDelete(transactionData as AdjustmentTransaction, event.params.bookId);
       break;
     default:
       console.log('Transaction type is neither income, expense, transfer nor adjustment. Skipping wallet balance update.');
     }
-  });
+  }
+);

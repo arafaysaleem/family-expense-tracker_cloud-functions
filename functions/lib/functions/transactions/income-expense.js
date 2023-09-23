@@ -9,7 +9,7 @@ const handleNewIncomeExpense = async (transactionData, bookId) => {
     const type = transactionData.type;
     const amount = transactionData.amount;
     const walletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${walletId}`);
-    const isIncome = type === transaction_type_enum_1.default.Income ? 1 : -1;
+    const isIncome = type === transaction_type_enum_1.TransactionType.Income ? 1 : -1;
     const newBalance = firebase_admin_1.FieldValue.increment(amount * isIncome);
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
@@ -21,7 +21,7 @@ const handleIncomeExpenseUpdate = async (transactionBefore, transactionAfter, bo
     const typeAfter = transactionAfter.type;
     const amountBefore = transactionBefore.amount;
     const amountAfter = transactionAfter.amount;
-    const isIncome = typeAfter === transaction_type_enum_1.default.Income ? 1 : -1;
+    const isIncome = typeAfter === transaction_type_enum_1.TransactionType.Income ? 1 : -1;
     const typeChanged = typeAfter !== typeBefore ? 1 : -1;
     const walletRef = firebase_admin_1.firestore.doc(`books/${bookId}`);
     const newAmount = amountAfter + amountBefore * typeChanged;
@@ -35,7 +35,7 @@ const handleIncomeExpenseDelete = async (transactionData, bookId) => {
     const type = transactionData.type;
     const amount = transactionData.amount;
     const walletRef = firebase_admin_1.firestore.doc(`${firestore_paths_1.FirestorePaths.BOOKS}/${bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/${walletId}`);
-    const isExpense = type === transaction_type_enum_1.default.Expense ? 1 : -1;
+    const isExpense = type === transaction_type_enum_1.TransactionType.Expense ? 1 : -1;
     const newBalance = firebase_admin_1.FieldValue.increment(amount * isExpense);
     await walletRef.update({ balance: newBalance });
     console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);

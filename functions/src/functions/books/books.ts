@@ -1,7 +1,7 @@
-import * as functions from 'firebase-functions';
-import { FieldValue, firestore } from '../../core/firebase-admin';
+import { onDocumentCreated, onDocumentUpdated, onDocumentDeleted } from 'firebase-functions/v2/firestore';
+import { FIRESTORE_DB_NAME, FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
-import DefaultsType from '../../enums/defaults_type.enum';
+import { DefaultsType } from '../../enums/defaults_type.enum';
 import { Wallet } from '../wallets/wallets';
 
 interface Member {
@@ -17,9 +17,13 @@ enum BookRoles {
   owner = 'owner',
 }
 
-export const addBookToOwner = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}`)
-  .onCreate(async (snapshot) => {
+export const addBookToOwner = onDocumentCreated(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}`
+  },
+  async (event) => {
+    const snapshot = event.data!;
     const bookId = snapshot.id;
     const membersMap = snapshot.get(BookFields.members) as Record<string, Member>;
 
@@ -49,9 +53,13 @@ export const addBookToOwner = functions.firestore
     }
   });
 
-export const addBookToMember = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}`)
-  .onUpdate(async (change) => {
+export const addBookToMember = onDocumentUpdated(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}`
+  },
+  async (event) => {
+    const change = event.data!;
     const bookId = change.after.id;
     const membersMap = change.after.get(BookFields.members) as Record<string, Member>;
 
@@ -75,9 +83,13 @@ export const addBookToMember = functions.firestore
     }
   });
 
-export const deleteBookFromMembers = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}`)
-  .onDelete(async (snap, context) => {
+export const deleteBookFromMembers = onDocumentDeleted(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}`
+  },
+  async (event) => {
+    const snap = event.data!;
     const bookData = snap.data();
     const membersMap = bookData.get(BookFields.members) as Record<string, Member>;
 
@@ -90,7 +102,7 @@ export const deleteBookFromMembers = functions.firestore
 
         // Remove the book id from the user's 'owned_book_ids' array if the user is the owner
         // Otherwise, remove the book id from the user's 'shared_book_ids' array
-        const bookIdsArr = FieldValue.arrayRemove(context.params.bookId);
+        const bookIdsArr = FieldValue.arrayRemove(event.params.bookId);
         if (member.role === BookRoles.owner) {
           await userRef.update({ owned_book_ids: bookIdsArr });
         } else {

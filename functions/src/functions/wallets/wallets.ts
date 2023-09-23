@@ -1,8 +1,9 @@
-import * as functions from 'firebase-functions';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { FirestorePaths } from '../../core/firestore-paths';
 import { AdjustmentTransaction } from '../transactions/balance-adjustment';
-import TransactionType from '../../enums/transaction_type.enum';
+import { TransactionType } from '../../enums/transaction_type.enum';
 import { createNewTransaction } from '../transactions/transactions';
+import { FIRESTORE_DB_NAME } from '../../core/firebase-admin';
 
 export interface Wallet {
   name: string
@@ -11,12 +12,16 @@ export interface Wallet {
   balance: number,
   color: string,
   description: string | undefined,
-  is_enabled: boolean,
+  is_enabled: boolean
 }
 
-export const createBalanceAdjustmentOnNewWallet = functions.firestore
-  .document(`${FirestorePaths.BOOKS}/{bookId}/${FirestorePaths.WALLETS}/{walletId}`)
-  .onCreate(async (snap, context) => {
+export const createBalanceAdjustmentOnNewWallet = onDocumentCreated(
+  {
+    database: FIRESTORE_DB_NAME,
+    document: `${FirestorePaths.BOOKS}/{bookId}/${FirestorePaths.WALLETS}/{walletId}`
+  },
+  async (event) => {
+    const snap = event.data!;
     const walletData = snap.data();
 
     // usually for default wallets, bcz user can't create wallet with 0 balance
@@ -29,5 +34,6 @@ export const createBalanceAdjustmentOnNewWallet = functions.firestore
       wallet_id: walletData.id,
       date: new Date()
     };
-    await createNewTransaction(adjustmentTransaction, context.params.bookId);
-  });
+    await createNewTransaction(adjustmentTransaction, event.params.bookId);
+  }
+);

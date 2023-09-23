@@ -1,6 +1,6 @@
 import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
-import TransactionType from '../../enums/transaction_type.enum';
+import { TransactionType } from '../../enums/transaction_type.enum';
 
 export interface BalanceTransferTransaction {
   type: TransactionType.Transfer;

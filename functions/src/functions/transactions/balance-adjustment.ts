@@ -1,6 +1,6 @@
 import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
-import TransactionType from '../../enums/transaction_type.enum';
+import { TransactionType } from '../../enums/transaction_type.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { formatDateToISO } from '../../utils/utils';
 

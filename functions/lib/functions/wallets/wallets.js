@@ -1,24 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBalanceAdjustmentOnNewWallet = void 0;
-const functions = require("firebase-functions");
+const firestore_1 = require("firebase-functions/v2/firestore");
 const firestore_paths_1 = require("../../core/firestore-paths");
 const transaction_type_enum_1 = require("../../enums/transaction_type.enum");
 const transactions_1 = require("../transactions/transactions");
-exports.createBalanceAdjustmentOnNewWallet = functions.firestore
-    .document(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/{walletId}`)
-    .onCreate(async (snap, context) => {
+const firebase_admin_1 = require("../../core/firebase-admin");
+exports.createBalanceAdjustmentOnNewWallet = (0, firestore_1.onDocumentCreated)({
+    database: firebase_admin_1.FIRESTORE_DB_NAME,
+    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/${firestore_paths_1.FirestorePaths.WALLETS}/{walletId}`
+}, async (event) => {
+    const snap = event.data;
     const walletData = snap.data();
     // usually for default wallets, bcz user can't create wallet with 0 balance
     if (walletData.balance === 0)
         return;
     const adjustmentTransaction = {
-        type: transaction_type_enum_1.default.Adjustment,
+        type: transaction_type_enum_1.TransactionType.Adjustment,
         amount: walletData.balance,
         previous_amount: 0,
         wallet_id: walletData.id,
         date: new Date()
     };
-    await (0, transactions_1.createNewTransaction)(adjustmentTransaction, context.params.bookId);
+    await (0, transactions_1.createNewTransaction)(adjustmentTransaction, event.params.bookId);
 });
 //# sourceMappingURL=wallets.js.map
