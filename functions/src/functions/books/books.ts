@@ -1,5 +1,5 @@
 import { onDocumentCreated, onDocumentUpdated, onDocumentDeleted } from 'firebase-functions/v2/firestore';
-import { FIRESTORE_DB_NAME, FieldValue, firestore } from '../../core/firebase-admin';
+import { FieldValue, firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import { DefaultsType } from '../../enums/defaults_type.enum';
 import { Wallet } from '../wallets/wallets';
@@ -18,10 +18,7 @@ enum BookRoles {
 }
 
 export const addBookToOwner = onDocumentCreated(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}`,
   async (event) => {
     const snapshot = event.data!;
     const bookId = snapshot.id;
@@ -54,10 +51,7 @@ export const addBookToOwner = onDocumentCreated(
   });
 
 export const addBookToMember = onDocumentUpdated(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}`,
   async (event) => {
     const change = event.data!;
     const bookId = change.after.id;
@@ -84,10 +78,7 @@ export const addBookToMember = onDocumentUpdated(
   });
 
 export const deleteBookFromMembers = onDocumentDeleted(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}`,
   async (event) => {
     const snap = event.data!;
     const bookData = snap.data();

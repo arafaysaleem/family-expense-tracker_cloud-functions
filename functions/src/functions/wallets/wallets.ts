@@ -3,7 +3,6 @@ import { FirestorePaths } from '../../core/firestore-paths';
 import { AdjustmentTransaction } from '../transactions/balance-adjustment';
 import { TransactionType } from '../../enums/transaction_type.enum';
 import { createNewTransaction } from '../transactions/transactions';
-import { FIRESTORE_DB_NAME } from '../../core/firebase-admin';
 
 export interface Wallet {
   name: string
@@ -16,10 +15,7 @@ export interface Wallet {
 }
 
 export const createBalanceAdjustmentOnNewWallet = onDocumentCreated(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}/${FirestorePaths.WALLETS}/{walletId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}/${FirestorePaths.WALLETS}/{walletId}`,
   async (event) => {
     const snap = event.data!;
     const walletData = snap.data();

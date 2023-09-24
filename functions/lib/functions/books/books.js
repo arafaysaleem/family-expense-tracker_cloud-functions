@@ -12,10 +12,7 @@ var BookRoles;
 (function (BookRoles) {
     BookRoles["owner"] = "owner";
 })(BookRoles || (BookRoles = {}));
-exports.addBookToOwner = (0, firestore_1.onDocumentCreated)({
-    database: firebase_admin_1.FIRESTORE_DB_NAME,
-    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`
-}, async (event) => {
+exports.addBookToOwner = (0, firestore_1.onDocumentCreated)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`, async (event) => {
     const snapshot = event.data;
     const bookId = snapshot.id;
     const membersMap = snapshot.get(BookFields.members);
@@ -39,10 +36,7 @@ exports.addBookToOwner = (0, firestore_1.onDocumentCreated)({
         console.error(error);
     }
 });
-exports.addBookToMember = (0, firestore_1.onDocumentUpdated)({
-    database: firebase_admin_1.FIRESTORE_DB_NAME,
-    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`
-}, async (event) => {
+exports.addBookToMember = (0, firestore_1.onDocumentUpdated)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`, async (event) => {
     const change = event.data;
     const bookId = change.after.id;
     const membersMap = change.after.get(BookFields.members);
@@ -63,10 +57,7 @@ exports.addBookToMember = (0, firestore_1.onDocumentUpdated)({
         console.error(error);
     }
 });
-exports.deleteBookFromMembers = (0, firestore_1.onDocumentDeleted)({
-    database: firebase_admin_1.FIRESTORE_DB_NAME,
-    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`
-}, async (event) => {
+exports.deleteBookFromMembers = (0, firestore_1.onDocumentDeleted)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`, async (event) => {
     const snap = event.data;
     const bookData = snap.data();
     const membersMap = bookData.get(BookFields.members);

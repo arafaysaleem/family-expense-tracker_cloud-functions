@@ -4,7 +4,6 @@ import { TransactionType } from './../../enums/transaction_type.enum';
 import { handleNewBalanceTransfer, BalanceTransferTransaction, handleBalanceTransferUpdate, handleBalanceTransferDelete } from './balance-transfer';
 import { handleIncomeExpenseDelete, handleIncomeExpenseUpdate, handleNewIncomeExpense, IncomeExpenseTransaction } from './income-expense';
 import { AdjustmentTransaction, handleBalanceAdjustmentDelete, handleNewBalanceAdjustment, createNewBalanceAdjustment } from './balance-adjustment';
-import { FIRESTORE_DB_NAME } from '../../core/firebase-admin';
 
 export const createNewTransaction = async (
   transactionData: IncomeExpenseTransaction | BalanceTransferTransaction | AdjustmentTransaction,
@@ -25,10 +24,7 @@ export const createNewTransaction = async (
 };
 
 export const updateWalletBalanceOnNewTransaction = onDocumentCreated(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`,
   async (event) => {
     const transactionData = event.data!.data();
 
@@ -50,10 +46,7 @@ export const updateWalletBalanceOnNewTransaction = onDocumentCreated(
 );
 
 export const updateWalletBalanceOnTransactionUpdate = onDocumentUpdated(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`,
   async (event) => {
     const transactionBefore = event.data!.before.data();
     const transactionAfter = event.data!.after.data();
@@ -75,10 +68,7 @@ export const updateWalletBalanceOnTransactionUpdate = onDocumentUpdated(
 );
 
 export const updateWalletBalanceOnTransactionDelete = onDocumentDeleted(
-  {
-    database: FIRESTORE_DB_NAME,
-    document: `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
-  },
+  `${FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`,
   async (event) => {
     const transactionData = event.data!.data();
 

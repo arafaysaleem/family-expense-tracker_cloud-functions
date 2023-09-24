@@ -7,7 +7,6 @@ const transaction_type_enum_1 = require("./../../enums/transaction_type.enum");
 const balance_transfer_1 = require("./balance-transfer");
 const income_expense_1 = require("./income-expense");
 const balance_adjustment_1 = require("./balance-adjustment");
-const firebase_admin_1 = require("../../core/firebase-admin");
 const createNewTransaction = async (transactionData, bookId) => {
     switch (transactionData.type) {
         case transaction_type_enum_1.TransactionType.Adjustment:
@@ -23,10 +22,7 @@ const createNewTransaction = async (transactionData, bookId) => {
     }
 };
 exports.createNewTransaction = createNewTransaction;
-exports.updateWalletBalanceOnNewTransaction = (0, firestore_1.onDocumentCreated)({
-    database: firebase_admin_1.FIRESTORE_DB_NAME,
-    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
-}, async (event) => {
+exports.updateWalletBalanceOnNewTransaction = (0, firestore_1.onDocumentCreated)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`, async (event) => {
     const transactionData = event.data.data();
     switch (transactionData.type) {
         case transaction_type_enum_1.TransactionType.Income:
@@ -43,10 +39,7 @@ exports.updateWalletBalanceOnNewTransaction = (0, firestore_1.onDocumentCreated)
             console.log('Transaction type is not income, expense, transfer or adjustment. Skipping wallet balance update.');
     }
 });
-exports.updateWalletBalanceOnTransactionUpdate = (0, firestore_1.onDocumentUpdated)({
-    database: firebase_admin_1.FIRESTORE_DB_NAME,
-    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
-}, async (event) => {
+exports.updateWalletBalanceOnTransactionUpdate = (0, firestore_1.onDocumentUpdated)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`, async (event) => {
     const transactionBefore = event.data.before.data();
     const transactionAfter = event.data.after.data();
     if (transactionAfter.type === transaction_type_enum_1.TransactionType.Income || transactionAfter.type === transaction_type_enum_1.TransactionType.Expense) {
@@ -56,10 +49,7 @@ exports.updateWalletBalanceOnTransactionUpdate = (0, firestore_1.onDocumentUpdat
         await (0, balance_transfer_1.handleBalanceTransferUpdate)(transactionBefore, transactionAfter, event.params.bookId);
     }
 });
-exports.updateWalletBalanceOnTransactionDelete = (0, firestore_1.onDocumentDeleted)({
-    database: firebase_admin_1.FIRESTORE_DB_NAME,
-    document: `${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`
-}, async (event) => {
+exports.updateWalletBalanceOnTransactionDelete = (0, firestore_1.onDocumentDeleted)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}/{transactionCollectionId}/{transactionId}`, async (event) => {
     const transactionData = event.data.data();
     switch (transactionData.type) {
         case transaction_type_enum_1.TransactionType.Income:
