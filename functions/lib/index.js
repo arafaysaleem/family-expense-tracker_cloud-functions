@@ -4,8 +4,7 @@ exports.wallets = exports.transactions = exports.users = exports.books = void 0;
 // Book functions
 const books_1 = require("./functions/books/books");
 exports.books = {
-    addBookToOwner: books_1.addBookToOwner,
-    addBookToMember: books_1.addBookToMember,
+    setupNewBookDefaults: books_1.setupNewBookDefaults,
     deleteBookFromMembers: books_1.deleteBookFromMembers
 };
 // User functions

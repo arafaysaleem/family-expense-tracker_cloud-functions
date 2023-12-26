@@ -1,9 +1,8 @@
 
 // Book functions
-import { addBookToOwner, addBookToMember, deleteBookFromMembers } from './functions/books/books';
+import { setupNewBookDefaults, deleteBookFromMembers } from './functions/books/books';
 export const books = {
-  addBookToOwner,
-  addBookToMember,
+  setupNewBookDefaults,
   deleteBookFromMembers
 };
 
