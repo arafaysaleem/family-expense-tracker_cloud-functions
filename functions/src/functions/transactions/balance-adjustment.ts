@@ -32,15 +32,6 @@ export const createNewBalanceAdjustment = async (transactionData: AdjustmentTran
   console.log(`Adjusted balance for wallet id: ${transactionData.wallet_id}, to: ${newBalance}.`);
 };
 
-export const handleNewBalanceAdjustment = async (transactionData: AdjustmentTransaction, bookId: string): Promise<void> => {
-  const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${transactionData.wallet_id}`);
-
-  const newBalance = transactionData.amount;
-  await walletRef.update({ balance: newBalance });
-
-  console.log(`Adjusted balance for wallet id: ${transactionData.wallet_id}, to: ${newBalance}.`);
-};
-
 export const handleBalanceAdjustmentDelete = async (transactionData: AdjustmentTransaction, bookId: string): Promise<void> => {
   const walletId = transactionData.wallet_id;
   const nowAmount = transactionData.amount;

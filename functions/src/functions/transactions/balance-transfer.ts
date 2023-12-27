@@ -11,26 +11,6 @@ export interface BalanceTransferTransaction {
   description: string | undefined;
 }
 
-
-export const handleNewBalanceTransfer = async (transactionData: BalanceTransferTransaction, bookId: string): Promise<void> => {
-  const amount = transactionData.amount;
-  const srcWalletId = transactionData.src_wallet_id;
-  const destWalletId = transactionData.dest_wallet_id;
-
-  const srcWalletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${srcWalletId}`);
-  const destWalletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${destWalletId}`);
-
-  const newSrcBalance = FieldValue.increment(-amount);
-  const newDestBalance = FieldValue.increment(amount);
-
-  await Promise.all([
-    srcWalletRef.update({ balance: newSrcBalance }),
-    destWalletRef.update({ balance: newDestBalance })
-  ]);
-
-  console.log(`Updated balance for src wallet ${srcWalletId} to ${newSrcBalance} and dest wallet ${destWalletId} to ${newDestBalance}.`);
-};
-
 export const handleBalanceTransferUpdate = async (
   transactionBefore: BalanceTransferTransaction,
   transactionAfter: BalanceTransferTransaction,

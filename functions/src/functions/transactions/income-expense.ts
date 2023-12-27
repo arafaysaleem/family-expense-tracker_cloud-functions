@@ -11,21 +11,6 @@ export interface IncomeExpenseTransaction {
   description: string | undefined;
 }
 
-export const handleNewIncomeExpense = async (transactionData: IncomeExpenseTransaction, bookId: string): Promise<void> => {
-  const walletId = transactionData.wallet_id;
-  const type = transactionData.type;
-  const amount = transactionData.amount;
-
-  const walletRef = firestore.doc(`${FirestorePaths.BOOKS}/${bookId}/${FirestorePaths.WALLETS}/${walletId}`);
-
-  const isIncome = type === TransactionType.Income ? 1 : -1;
-  const newBalance = FieldValue.increment(amount * isIncome);
-
-  await walletRef.update({ balance: newBalance });
-
-  console.log(`Updated balance for wallet ${walletId} to ${newBalance}.`);
-};
-
 export const handleIncomeExpenseUpdate = async (
   transactionBefore: IncomeExpenseTransaction,
   transactionAfter: IncomeExpenseTransaction,

@@ -14,12 +14,10 @@ export const users = {
 
 // Transaction functions
 import {
-  updateWalletBalanceOnNewTransaction,
   updateWalletBalanceOnTransactionUpdate,
   updateWalletBalanceOnTransactionDelete
 } from './functions/transactions/transactions';
 export const transactions = {
-  updateWalletBalanceOnNewTransaction,
   updateWalletBalanceOnTransactionUpdate,
   updateWalletBalanceOnTransactionDelete
 };
