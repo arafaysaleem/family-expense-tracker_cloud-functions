@@ -7,7 +7,7 @@ export interface Wallet {
   name: string
   id: string,
   icon_key: string,
-  has_transactions: boolean,
+  transactions_count: number,
   balance: number,
   color: string,
   description: string | undefined,
