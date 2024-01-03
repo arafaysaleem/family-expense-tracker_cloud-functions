@@ -1,8 +1,7 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { FirestorePaths } from '../../core/firestore-paths';
-import { AdjustmentTransaction } from '../transactions/balance-adjustment';
+import { AdjustmentTransaction, createNewBalanceAdjustment } from '../transactions/balance-adjustment';
 import { TransactionType } from '../../enums/transaction_type.enum';
-import { createNewTransaction } from '../transactions/transactions';
 
 export interface Wallet {
   name: string
@@ -31,6 +30,6 @@ export const createBalanceAdjustmentOnNewWallet = onDocumentCreated(
       wallet_id: walletData.id,
       date: new Date()
     };
-    await createNewTransaction(adjustmentTransaction, event.params.bookId);
+    await createNewBalanceAdjustment(adjustmentTransaction, event.params.bookId);
   }
 );
