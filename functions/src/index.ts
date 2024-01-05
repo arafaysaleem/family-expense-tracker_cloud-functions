@@ -19,9 +19,3 @@ import {
 export const transactions = {
   updateWalletBalanceOnTransactionUpdate
 };
-
-// Wallet functions
-import { createBalanceAdjustmentOnNewWallet } from './functions/wallets/wallets';
-export const wallets = {
-  createBalanceAdjustmentOnNewWallet
-};
