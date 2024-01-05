@@ -4,4 +4,5 @@ export class FirestorePaths {
   static readonly TRANSACTIONS = 'transactions';
   static readonly WALLETS = 'wallets';
   static readonly DEFAULTS = 'defaults';
+  static readonly CATEGORIES = 'categories';
 }
