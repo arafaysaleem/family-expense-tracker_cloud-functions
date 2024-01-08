@@ -17,13 +17,22 @@ exports.setupNewBookDefaults = (0, firestore_1.onDocumentCreated)(`${firestore_p
     const bookId = snapshot.id;
     try {
         // Get the new book defaults from the 'defaults' collection
-        const defaultWalletsRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.DEFAULTS).doc(defaults_type_enum_1.DefaultsType.Wallets);
+        const defaultsRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.DEFAULTS);
+        const defaultWalletsRef = defaultsRef.doc(defaults_type_enum_1.DefaultsType.Wallets);
+        const defaultCategoriesRef = defaultsRef.doc(defaults_type_enum_1.DefaultsType.Categories);
         const defaultWallets = (await defaultWalletsRef.get()).data().items;
+        const defaultCategories = (await defaultCategoriesRef.get()).data().items;
         // Create a new 'wallets' collection for the book
-        const walletsRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.BOOKS).doc(bookId).collection(firestore_paths_1.FirestorePaths.WALLETS);
+        const bookRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.BOOKS).doc(bookId);
+        const walletsRef = bookRef.collection(firestore_paths_1.FirestorePaths.WALLETS);
+        const categoriesRef = bookRef.collection(firestore_paths_1.FirestorePaths.CATEGORIES);
         // Add the default wallets to the 'wallets' collection
         const wallets = defaultWallets.map((wallet) => walletsRef.doc(wallet.id).set(wallet));
-        await Promise.all(wallets);
+        const categories = defaultCategories.map((category) => categoriesRef.doc(category.id).set(category));
+        await Promise.all([
+            ...wallets,
+            ...categories
+        ]);
     }
     catch (error) {
         console.error(error);

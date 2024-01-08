@@ -9,4 +9,5 @@ FirestorePaths.USERS = 'users';
 FirestorePaths.TRANSACTIONS = 'transactions';
 FirestorePaths.WALLETS = 'wallets';
 FirestorePaths.DEFAULTS = 'defaults';
+FirestorePaths.CATEGORIES = 'categories';
 //# sourceMappingURL=firestore-paths.js.map
