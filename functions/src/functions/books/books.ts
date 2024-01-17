@@ -9,7 +9,7 @@ interface Member {
   image_url: string;
 }
 
-class BookFields {
+export class BookFields {
   static members = 'members';
 }
 

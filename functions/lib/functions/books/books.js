@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBookFromMembers = exports.setupNewBookDefaults = void 0;
+exports.deleteBookFromMembers = exports.setupNewBookDefaults = exports.BookFields = void 0;
 const firestore_1 = require("firebase-functions/v2/firestore");
 const firebase_admin_1 = require("../../core/firebase-admin");
 const firestore_paths_1 = require("../../core/firestore-paths");
 const defaults_type_enum_1 = require("../../enums/defaults_type.enum");
 class BookFields {
 }
+exports.BookFields = BookFields;
 BookFields.members = 'members';
 var BookRoles;
 (function (BookRoles) {

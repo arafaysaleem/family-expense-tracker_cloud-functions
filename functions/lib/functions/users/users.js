@@ -23,10 +23,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createNewUser = void 0;
+exports.updateUserImageAcrossBooks = exports.createNewUser = void 0;
 const functions = __importStar(require("firebase-functions"));
 const firebase_admin_1 = require("../../core/firebase-admin");
 const firestore_paths_1 = require("../../core/firestore-paths");
+const firestore_1 = require("firebase-functions/v2/firestore");
+const books_1 = require("../books/books");
+class UserFields {
+}
+UserFields.image_url = 'image_url';
 exports.createNewUser = functions.auth
     .user()
     .onCreate(async (user) => {
@@ -43,6 +48,29 @@ exports.createNewUser = functions.auth
             owned_book_ids: [],
             shared_book_ids: []
         });
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
+exports.updateUserImageAcrossBooks = (0, firestore_1.onDocumentUpdated)(`${firestore_paths_1.FirestorePaths.USERS}/{userId}`, async (event) => {
+    const change = event.data;
+    const newUser = change.after.data();
+    const imageUrlBefore = change.before.get(UserFields.image_url);
+    // If the image url hasn't changed, do nothing
+    if (imageUrlBefore === newUser.image_url)
+        return;
+    // Get the all the owned and shared books of the user
+    const books = [...newUser.owned_book_ids, ...newUser.shared_book_ids];
+    // Replace the image url from each of their members map
+    try {
+        const batch = firebase_admin_1.firestore.batch();
+        books.forEach((bookId) => {
+            const bookRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.BOOKS).doc(bookId);
+            const imageFieldRef = `${books_1.BookFields.members}.${newUser.uid}.${UserFields.image_url}`;
+            batch.update(bookRef, { [imageFieldRef]: newUser.image_url });
+        });
+        await batch.commit();
     }
     catch (error) {
         console.error(error);
