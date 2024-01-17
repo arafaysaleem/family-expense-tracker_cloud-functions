@@ -10,6 +10,7 @@ exports.books = {
 // User functions
 const users_1 = require("./functions/users/users");
 exports.users = {
-    createNewUser: users_1.createNewUser
+    createNewUser: users_1.createNewUser,
+    updateUserImageAcrossBooks: users_1.updateUserImageAcrossBooks
 };
 //# sourceMappingURL=index.js.map

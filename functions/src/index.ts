@@ -7,7 +7,8 @@ export const books = {
 };
 
 // User functions
-import { createNewUser } from './functions/users/users';
+import { createNewUser, updateUserImageAcrossBooks } from './functions/users/users';
 export const users = {
-  createNewUser
+  createNewUser,
+  updateUserImageAcrossBooks
 };
