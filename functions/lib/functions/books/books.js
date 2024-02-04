@@ -42,7 +42,7 @@ exports.setupNewBookDefaults = (0, firestore_1.onDocumentCreated)(`${firestore_p
 exports.deleteBookFromMembers = (0, firestore_1.onDocumentDeleted)(`${firestore_paths_1.FirestorePaths.BOOKS}/{bookId}`, async (event) => {
     const snap = event.data;
     const bookData = snap.data();
-    const membersMap = bookData.get(BookFields.members);
+    const membersMap = bookData.members;
     for (const memberId of Object.keys(membersMap)) {
         try {
             const member = membersMap[memberId];

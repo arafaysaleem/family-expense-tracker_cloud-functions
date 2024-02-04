@@ -54,7 +54,7 @@ export const deleteBookFromMembers = onDocumentDeleted(
   async (event) => {
     const snap = event.data!;
     const bookData = snap.data();
-    const membersMap = bookData.get(BookFields.members) as Record<string, Member>;
+    const membersMap = bookData.members as Record<string, Member>;
 
     for (const memberId of Object.keys(membersMap)) {
       try {
