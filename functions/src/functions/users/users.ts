@@ -3,6 +3,7 @@ import { firestore } from '../../core/firebase-admin';
 import { FirestorePaths } from '../../core/firestore-paths';
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { BookFields } from '../books/books';
+import { v4 as uuidv4 } from 'uuid';
 
 interface User {
   uid: string;
@@ -26,14 +27,36 @@ export const createNewUser = functions.auth
       // Create a new document with the user id as the document id
       const userRef = firestore.collection(FirestorePaths.USERS).doc(uid);
 
+      // Create a new default book
+      const bookId: string = uuidv4();
+
       // Set the fields of the new document
       await userRef.set({
         uid,
         displayName,
         email,
         image_url: photoURL,
-        owned_book_ids: [],
+        owned_book_ids: [bookId],
         shared_book_ids: []
+      });
+
+
+      const booksRef = firestore.collection(FirestorePaths.BOOKS).doc(bookId);
+
+      await booksRef.set({
+        id: bookId,
+        name: 'Household Financials',
+        currency_name: 'USD',
+        color: '#0047E0',
+        icon_key: 'bookOpen',
+        is_enabled: true,
+        description: 'For collaborating on family finances',
+        members: {
+          [uid]: {
+            role: 'owner',
+            image_url: photoURL
+          }
+        }
       });
     } catch (error) {
       console.error(error);
@@ -68,3 +91,4 @@ export const updateUserImageAcrossBooks = onDocumentUpdated(
       console.error(error);
     }
   });
+
