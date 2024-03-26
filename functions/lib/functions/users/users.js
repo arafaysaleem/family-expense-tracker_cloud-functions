@@ -29,7 +29,6 @@ const firebase_admin_1 = require("../../core/firebase-admin");
 const firestore_paths_1 = require("../../core/firestore-paths");
 const firestore_1 = require("firebase-functions/v2/firestore");
 const books_1 = require("../books/books");
-const uuid_1 = require("uuid");
 class UserFields {
 }
 UserFields.image_url = 'image_url';
@@ -40,33 +39,34 @@ exports.createNewUser = functions.auth
     try {
         // Create a new document with the user id as the document id
         const userRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.USERS).doc(uid);
-        // Create a new default book
-        const bookId = (0, uuid_1.v4)();
+        // // Create a new default book
+        // const bookId: string = uuidv4();
         // Set the fields of the new document
         await userRef.set({
             uid,
             displayName,
             email,
             image_url: photoURL,
-            owned_book_ids: [bookId],
+            owned_book_ids: [],
+            // owned_book_ids: [bookId],
             shared_book_ids: []
         });
-        const booksRef = firebase_admin_1.firestore.collection(firestore_paths_1.FirestorePaths.BOOKS).doc(bookId);
-        await booksRef.set({
-            id: bookId,
-            name: 'Household Financials',
-            currency_name: 'USD',
-            color: '#0047E0',
-            icon_key: 'bookOpen',
-            is_enabled: true,
-            description: 'For collaborating on family finances',
-            members: {
-                [uid]: {
-                    role: 'owner',
-                    image_url: photoURL
-                }
-            }
-        });
+        // const booksRef = firestore.collection(FirestorePaths.BOOKS).doc(bookId);
+        // await booksRef.set({
+        //   id: bookId,
+        //   name: 'Household Financials',
+        //   currency_name: 'USD',
+        //   color: '#0047E0',
+        //   icon_key: 'bookOpen',
+        //   is_enabled: true,
+        //   description: 'For collaborating on family finances',
+        //   members: {
+        //     [uid]: {
+        //       role: 'owner',
+        //       image_url: photoURL
+        //     }
+        //   }
+        // });
     }
     catch (error) {
         console.error(error);
